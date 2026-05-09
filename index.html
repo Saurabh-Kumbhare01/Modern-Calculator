@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CALC-X is a beautifully crafted, highly responsive modern web calculator featuring glassmorphism design, scientific functions, calculation history, and smooth animations.">
+    <title>CALC-X | Modern Web Calculator</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#0ea5e9',
+                        secondary: '#8b5cf6',
+                        darkBg: '#0f172a',
+                        lightBg: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
+
+
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/src/css/style.css">
+    
+    <!-- Math.js for Scientific Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+</head>
+<body class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 transition-colors duration-500 min-h-screen flex items-center justify-center relative overflow-hidden font-sans">
+    
+    <!-- Animated Ambient Orbs -->
+    <div class="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px] animate-pulse"></div>
+    <div class="absolute bottom-[-15%] right-[-10%] w-[50%] h-[50%] rounded-full bg-secondary/20 blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+
+    <div class="calculator-container relative z-10 w-full max-w-[340px] md:max-w-4xl mx-auto p-4 md:flex md:gap-6 items-stretch h-[100dvh] md:h-auto flex flex-col justify-center">
+        
+        <!-- Main Calculator Interface -->
+        <main class="glass-panel rounded-[2rem] p-5 shadow-2xl flex-1 flex flex-col relative transition-all duration-300 h-full md:h-auto md:max-h-[750px]">
+            
+            <!-- Header Operations -->
+            <header class="flex justify-between items-center mb-4 md:mb-6">
+                <h1 class="text-2xl font-display font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary drop-shadow-sm">CALC-X</h1>
+                <div class="flex gap-2">
+                    <button id="toggle-history" class="icon-btn hover:bg-black/5 dark:hover:bg-white/10" title="History">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </button>
+                    <button id="toggle-sound" class="icon-btn active hover:bg-black/5 dark:hover:bg-white/10 text-primary" title="Sound">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <button id="toggle-theme" class="icon-btn hover:bg-black/5 dark:hover:bg-white/10" title="Theme">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Display Screen -->
+            <div class="display-container bg-black/5 dark:bg-black/30 rounded-2xl p-4 md:p-5 mb-4 shadow-inner flex flex-col items-end justify-between min-h-[110px] md:min-h-[140px] relative border border-white/40 dark:border-white/5">
+                <div id="previous-operand" class="text-sm md:text-base text-slate-500 dark:text-slate-400 font-display min-h-[1.5rem] break-all text-right w-full tracking-wider"></div>
+                <div id="current-operand" class="text-4xl md:text-5xl font-display font-bold text-slate-800 dark:text-white break-all text-right w-full mt-2 tracking-wider overflow-hidden whitespace-nowrap">0</div>
+                <div id="error-message" class="absolute bottom-2 left-4 text-xs text-red-500 font-semibold opacity-0 transition-opacity">Error</div>
+            </div>
+
+            <!-- Keypad Area -->
+            <div class="grid grid-cols-4 md:grid-cols-7 gap-2 md:gap-3 flex-1">
+                
+                <!-- Scientific Panel (Responsive) -->
+                <div class="col-span-4 md:col-span-3 grid-cols-3 gap-2 md:gap-3 scientific-panel hidden md:grid h-full" id="scientific-panel">
+                    <button class="calc-btn sci-btn" data-action="sin">sin</button>
+                    <button class="calc-btn sci-btn" data-action="cos">cos</button>
+                    <button class="calc-btn sci-btn" data-action="tan">tan</button>
+                    <button class="calc-btn sci-btn" data-action="asin">sin⁻¹</button>
+                    <button class="calc-btn sci-btn" data-action="acos">cos⁻¹</button>
+                    <button class="calc-btn sci-btn" data-action="atan">tan⁻¹</button>
+                    <button class="calc-btn sci-btn" data-action="log">log</button>
+                    <button class="calc-btn sci-btn" data-action="ln">ln</button>
+                    <button class="calc-btn sci-btn" data-action="exp">eˣ</button>
+                    <button class="calc-btn sci-btn" data-action="sqrt">√</button>
+                    <button class="calc-btn sci-btn" data-action="cbrt">∛</button>
+                    <button class="calc-btn sci-btn" data-action="power">xʸ</button>
+                    <button class="calc-btn sci-btn" data-action="pi">π</button>
+                    <button class="calc-btn sci-btn" data-action="e">e</button>
+                    <button class="calc-btn sci-btn" data-action="factorial">x!</button>
+                    <button class="calc-btn sci-btn" data-action="open-paren">(</button>
+                    <button class="calc-btn sci-btn" data-action="close-paren">)</button>
+                    <button class="calc-btn sci-btn" data-action="percent">%</button>
+                </div>
+
+                <!-- Mobile Action Row -->
+                <button id="toggle-sci" class="calc-btn md:hidden col-span-2 text-sm font-semibold text-secondary">
+                    <i class="fa-solid fa-flask mr-2"></i> Scientific
+                </button>
+                <button class="calc-btn action-btn text-red-500 md:hidden col-span-1" data-action="clear">AC</button>
+                <button class="calc-btn action-btn md:hidden col-span-1" data-action="delete"><i class="fa-solid fa-delete-left"></i></button>
+
+                <!-- Basic Numeric/Operator Panel -->
+                <div class="col-span-4 grid grid-cols-4 gap-2 md:gap-3 basic-panel h-full">
+                    <button class="calc-btn action-btn text-red-500 hidden md:flex" data-action="clear">AC</button>
+                    <button class="calc-btn action-btn hidden md:flex" data-action="delete"><i class="fa-solid fa-delete-left"></i></button>
+                    <button class="calc-btn op-btn md:col-span-1 col-span-2" data-action="divide">÷</button>
+                    <button class="calc-btn op-btn md:col-span-1 col-span-2" data-action="multiply">×</button>
+                    
+                    <button class="calc-btn num-btn" data-number="7">7</button>
+                    <button class="calc-btn num-btn" data-number="8">8</button>
+                    <button class="calc-btn num-btn" data-number="9">9</button>
+                    <button class="calc-btn op-btn" data-action="subtract">−</button>
+
+                    <button class="calc-btn num-btn" data-number="4">4</button>
+                    <button class="calc-btn num-btn" data-number="5">5</button>
+                    <button class="calc-btn num-btn" data-number="6">6</button>
+                    <button class="calc-btn op-btn" data-action="add">+</button>
+
+                    <button class="calc-btn num-btn" data-number="1">1</button>
+                    <button class="calc-btn num-btn" data-number="2">2</button>
+                    <button class="calc-btn num-btn" data-number="3">3</button>
+                    <button class="calc-btn equals-btn row-span-2 text-white border-none shadow-lg" data-action="equals">=</button>
+
+                    <button class="calc-btn num-btn col-span-2" data-number="0">0</button>
+                    <button class="calc-btn num-btn" data-number=".">.</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Dynamic History Panel -->
+        <aside id="history-panel" class="glass-panel rounded-[2rem] p-6 shadow-2xl w-full md:w-80 hidden md:flex flex-col md:mt-0 max-h-[85vh] md:max-h-none transition-transform duration-300 absolute md:relative z-50 left-0 bottom-0 md:top-auto h-[80dvh] md:h-auto transform translate-y-full md:translate-y-0 md:translate-x-0">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-black/10 dark:border-white/10">
+                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-primary"></i> History
+                </h2>
+                <div class="flex gap-2">
+                    <button id="clear-history" class="icon-btn text-sm text-red-500 hover:bg-red-500/10" title="Clear History">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                    <button id="close-history" class="icon-btn md:hidden hover:bg-black/5 dark:hover:bg-white/10" title="Close">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="history-list" class="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar flex flex-col">
+                <!-- History elements injected via script.js -->
+            </div>
+        </aside>
+
+    </div>
+
+    <script type="module" src="/src/js/script.js"></script>
+</body>
+</html>
